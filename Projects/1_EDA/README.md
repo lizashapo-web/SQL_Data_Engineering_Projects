@@ -1,5 +1,21 @@
 # Data Engineer Skills Analysis
 
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Analysis Scope](#analysis-scope)
+- [Dataset Structure](#dataset-structure)
+- [SQL Analysis](#sql-analysis)
+  - [Most In-Demand Skills](#1-most-in-demand-skills)
+  - [Highest-Paying Skills](#2-highest-paying-skills)
+  - [Most Optimal Skills](#3-most-optimal-skills)
+- [Overall Conclusions](#overall-conclusions)
+- [SQL Concepts Used](#sql-concepts-used)
+- [Tools & Technologies](#tools--technologies)
+- [Project Structure](#project-structure)
+
+---
+
 ## Project Overview
 
 This project analyzes job postings for Data Engineers to identify the skills that are most valuable in the remote job market.
@@ -43,6 +59,8 @@ The tables are connected through job and skill IDs.
 
 ### 1. Most In-Demand Skills
 
+[View SQL query →](./01_top_demanded_skills.sql)
+
 The first analysis identifies the top 10 skills appearing most frequently in remote Data Engineer job postings.
 
 The query:
@@ -81,6 +99,8 @@ Apache Spark, Airflow, Snowflake, and Databricks demonstrate strong demand for d
 
 ## 2. Highest-Paying Skills
 
+[View SQL query →](./02_highest_paying_skills.sql)
+
 The second analysis examines the median annual salary associated with each skill.
 
 Only skills appearing in at least 100 job postings are included. This helps reduce the influence of skills that appear in only a very small number of postings.
@@ -117,6 +137,8 @@ This demonstrates that the highest-paying skill is not necessarily the most prac
 ---
 
 ## 3. Most Optimal Skills
+
+[View SQL query →](./03_most_optimal_skills.sql)
 
 The final analysis combines salary and demand into a single `optimal` score.
 
@@ -199,6 +221,16 @@ This project demonstrates practical SQL skills including:
 
 ---
 
+## Tools & Technologies
+
+- SQL
+- DuckDB
+- MotherDuck
+- Visual Studio Code
+- GitHub
+
+---
+
 ## Project Structure
 
 ```text
@@ -209,10 +241,5 @@ data-engineer-skills-analysis/
 ├── 03_most_optimal_skills.sql
 └── README.md
 ```
-## Tools & Technologies
 
-- SQL
-- DuckDB
-- MotherDuck
-- Visual Studio Code
-- GitHub
+---
