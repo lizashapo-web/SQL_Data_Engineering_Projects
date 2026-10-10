@@ -1,4 +1,4 @@
--- Step 2: DW - Load cleaned data into the warehouse
+-- Step 2: DW - Load data into the warehouse
 
 CREATE SCHEMA IF NOT EXISTS warehouse;
 
