@@ -28,7 +28,7 @@ GROUP BY error;
 
 CREATE SCHEMA IF NOT EXISTS staging;
 
-CREATE TABLE staging.job_postings AS
+CREATE TABLE IF NOT EXISTS staging.job_postings AS
 SELECT *
 FROM read_parquet(
     'D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_postings_*.parquet'
@@ -39,7 +39,7 @@ SELECT *
 FROM staging.job_postings
 LIMIT 10;
 
-CREATE TABLE staging.job_skills AS
+CREATE TABLE IF NOT EXISTS staging.job_skills AS
 SELECT *
 FROM read_parquet(
     'D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_skills.parquet'

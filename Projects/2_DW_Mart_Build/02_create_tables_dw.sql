@@ -2,11 +2,11 @@
 
 CREATE SCHEMA IF NOT EXISTS warehouse;
 
-CREATE TABLE warehouse.job_postings AS
+CREATE TABLE IF NOT EXISTS warehouse.job_postings AS
 SELECT *
 FROM staging.job_postings;
 
-CREATE TABLE warehouse.job_skills AS
+CREATE TABLE IF NOT EXISTS warehouse.job_skills AS
 SELECT *
 FROM staging.job_skills;
 
