@@ -54,25 +54,6 @@ The project analyzes technical skills associated with remote Data Analyst, Data 
 
 [Explore Project 2 →](Projects/2_DW_Mart_Build/README.md)
 
-## SQL Learning & Practice
-
-The [`Lessons`](Lessons/) directory contains SQL exercises and practical examples completed while studying relational databases and data engineering fundamentals.
-
-**Topics covered:**
-
-| Topic | Concepts |
-|---|---|
-| Data Modeling | Relational data structures and modeling |
-| JOINs | Combining data from multiple tables |
-| DDL & DML | Defining and manipulating database objects and data |
-| Subqueries & CTEs | Structuring complex SQL queries |
-| CASE Expressions | Conditional logic |
-| Date Functions | Working with dates and time |
-| Set Operators | Combining query results |
-| Text & NULL Functions | String processing and missing values |
-| Window Functions | Analytical calculations |
-| Nested Functions | Combining SQL functions |
-
 ## Tech Stack
 
 | Category | Technologies |
@@ -89,20 +70,12 @@ Additional technologies I am exploring include Python, PostgreSQL, MotherDuck, a
 
 ```text
 SQL_Data_Engineering_Projects/
-│
-├── Lessons/
-│   ├── 1.9/
-│   ├── 1.10/
-│   ├── ...
-│   └── 1.21_Nested_Functions/
-│
 ├── Projects/
 │   ├── 1_EDA/
 │   │   ├── 01_top_demanded_skills.sql
 │   │   ├── 02_highest_paying_skills.sql
 │   │   ├── 03_most_optimal_skills.sql
 │   │   └── README.md
-│   │
 │   └── 2_DW_Mart_Build/
 │       ├── 00_data_audit.sql
 │       ├── 01_create_tables_dw.sql
@@ -112,7 +85,6 @@ SQL_Data_Engineering_Projects/
 │       ├── 05_remote_skills_analysis.sql
 │       ├── build_marts.sql
 │       └── README.md
-│
 └── README.md
 ```
 
