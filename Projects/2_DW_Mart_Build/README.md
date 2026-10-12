@@ -22,6 +22,41 @@ The workflow covers source-data auditing, warehouse table creation, data transfo
 
 The project uses job-posting and skill data from the source dataset used in this repository. The analysis is limited to the records available in that dataset; it should not be interpreted as a complete census of the job market.
 
+## Data Requirements
+
+### Prerequisites
+
+- [DuckDB CLI](https://duckdb.org/docs/stable/clients/cli/overview) installed.
+- Git installed to clone the repository.
+- The source Parquet files available locally.
+
+### Expected Data Files
+
+The pipeline expects the following files in the `data/raw/` directory at the repository root:
+
+- `raw_job_postings_2025-07.parquet` through `raw_job_postings_2026-06.parquet` — monthly job-posting data.
+- `raw_job_skills.parquet` — job-to-skill data.
+
+The Parquet files are local inputs and are intentionally excluded from GitHub. They must be obtained separately from the original dataset source and placed in `data/raw/` before running the pipeline.
+
+Expected structure:
+
+```text
+SQL_Data_Engineering_Projects/
+├── data/
+│   └── raw/
+│       ├── raw_job_postings_2025-07.parquet
+│       ├── ...
+│       ├── raw_job_postings_2026-06.parquet
+│       └── raw_job_skills.parquet
+└── Projects/
+    └── 2_DW_Mart_Build/
+```
+
+Run all commands from the repository root because the SQL scripts use relative paths to the input files.
+
+**Note:** The source dataset's download location is not documented here. Make sure you obtain the files from the original dataset provider rather than expecting them to be included in this repository.
+
 ## Data Volume
 
 The source-data audit reported:
