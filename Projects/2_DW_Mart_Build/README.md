@@ -1,200 +1,140 @@
-# Remote Work Skills Intelligence
+# Project 2: Data Warehouse and Data Mart Build
 
 ## Overview
 
-**Remote Work Skills Intelligence** is a SQL-based Data Engineering and analytics project that explores skill demand across remote Data Analyst, Data Engineer, and Data Scientist job postings collected between July 2025 and June 2026.
+This project builds a DuckDB data warehouse and an analytical data mart for exploring remote Data Engineer job postings and their associated technical skills.
 
-The project demonstrates an end-to-end analytical workflow: auditing raw data, building a Data Warehouse, transforming job observations, creating a Data Mart, validating data quality, and analyzing skill demand across job roles.
-
-The goal is to turn raw job-posting data into a structured dataset that supports career research and data-driven decisions about which technical skills to learn.
+The workflow covers source-data auditing, warehouse table creation, data transformation, mart construction, quality checks, and SQL analysis.
 
 ## Business Questions
 
-- Which technical skills appear most frequently in remote job postings?
-- How does skill demand differ between Data Analysts, Data Engineers, and Data Scientists?
-- Which programming languages, cloud platforms, and data tools are most relevant to each role?
-- How does observed skill demand change over the collection period?
-- How can data quality issues affect the reliability of job-market analysis?
+- Which technical skills appear most often in remote Data Engineer job postings?
+- How are skills distributed across the collected remote-job sample?
+- Which skills are most relevant to candidates exploring remote Data Engineer roles?
 
 ## Tech Stack
 
-- **SQL** — data transformation, aggregation, analysis, and validation
-- **DuckDB** — analytical database and SQL execution engine
-- **Parquet** — source data storage
+- **SQL** — data auditing, transformations, modeling, validation, and analysis
+- **DuckDB** — local analytical database
 - **Git and GitHub** — version control and project documentation
 
 ## Data Sources
 
-The project uses job-posting and skill data collected between **July 2025 and June 2026**.
+The project uses job-posting and skill data from the source dataset used in this repository. The analysis is limited to the records available in that dataset; it should not be interpreted as a complete census of the job market.
 
-The source data includes job titles, company names, locations, search terms, collection dates, remote-work indicators, and skill keywords associated with job IDs.
+## Data Volume
 
-### Data Volume
+The source-data audit reported:
 
-| Dataset | Rows |
+| Dataset / metric | Rows or count |
 |---|---:|
-| Job postings in staging | 691,950 |
-| Job-skill records in staging | 3,304,574 |
-| Unique job IDs with remote-work evidence before final exclusions | 32,761 |
-| Remote job IDs with associated skills before final exclusions | 30,744 |
-| Remote job IDs without associated skills before final exclusions | 2,017 |
+| Source job postings | 691,950 |
+| Distinct non-null source job IDs | 491,140 |
+| Source job-skill records | 3,304,574 |
+| Remote candidates before ambiguous-ID exclusion | 32,761 |
+| Final remote job IDs in the mart | 32,760 |
+| Final mart rows | 262,171 |
+| Job-skill rows in the mart | 260,155 |
+| Rows representing jobs without skills | 2,016 |
 
-The Data Warehouse retains source observations rather than treating every repeated job ID as a separate job opportunity.
-
-The Data Mart applies additional eligibility and deduplication rules. One ambiguous job ID associated with conflicting company names or job titles is excluded from the final analytical dataset.
-
-The final Data Mart contains:
-
-- **32,760 unique job IDs**
-- **262,171 total rows**
-- **260,155 rows with skill associations**
-- **2,016 jobs without associated skills**
-
-The row counts reconcile:
-
-`260,155 + 2,016 = 262,171`
-
-### Source File Requirements
-
-The source Parquet files are stored locally and are not included in this repository.
-
-Expected source directory in the original development environment:
-
-```text
-D:/dbt_Analytics_Engineering_Course/project_1/data/raw/
-```
-
-The directory contains 12 monthly job-posting files, from `raw_job_postings_2025-07.parquet` through `raw_job_postings_2026-06.parquet`, and `raw_job_skills.parquet`.
-
-**Important:** The paths in `00_data_audit.sql` are environment-specific. Update them to match your local source data directory before running the pipeline.
+The remote-candidate count is reduced from 32,761 to 32,760 because one ambiguous job ID is excluded during preparation. The final mart contains 262,171 rows: 260,155 job-skill rows and 2,016 rows retained for jobs with no associated skills.
 
 ## Data Pipeline
 
-The pipeline consists of six stages:
+The pipeline is organized into sequential SQL scripts:
 
-1. **Data Audit** — inspect source data, identify missing values, examine repeated observations, and assess identifier quality.
-2. **Load the Data Warehouse** — load source datasets into warehouse tables.
-3. **Transform the Data Warehouse** — prepare job observations and candidate-level records for analysis.
-4. **Create the Data Mart** — build an analytical table combining eligible job records with their associated skills.
-5. **Test the Data Mart** — validate data quality assumptions and reconcile row counts.
-6. **Analyze Remote Job Openings** — compare skill demand across roles and examine observed temporal patterns.
+1. **Audit source data** — inspect source tables, counts, missing values, and key uniqueness.
+2. **Create warehouse tables** — establish the target tables and their structure.
+3. **Transform warehouse data** — clean and transform the source data for analysis.
+4. **Build the data mart** — select remote-job records and connect them to their skills.
+5. **Test the mart** — validate key assumptions and data quality.
+6. **Analyze remote skills** — aggregate skills and identify the most frequent ones.
 
-### Architecture
+## Architecture
 
 ```text
-Raw Parquet Data
-       |
-       v
-   Data Audit
-       |
-       v
-    Staging
-       |
-       v
- Data Warehouse
-       |
-       v
- Transformations
-       |
-       v
-    Data Mart
-       |
-       v
- Data Quality Tests
-       |
-       v
- Skill Demand Analysis
+Source tables
+    |
+    v
+00_data_audit.sql
+    |
+    v
+01_create_tables_dw.sql
+    |
+    v
+02_transform_warehouse.sql
+    |
+    v
+03_data_mart.sql
+    |
+    v
+04_test_mart.sql
+    |
+    v
+05_remote_skills_analysis.sql
+    |
+    v
+Remote Data Engineer skills analysis
 ```
 
-The `build_marts.sql` script orchestrates the individual SQL files in the intended execution order.
+The `build_marts.sql` script is the convenience entry point that runs the mart-building scripts in sequence. The audit and analysis scripts can also be run individually when needed.
 
 ## Data Modeling and Quality
 
-A central challenge in this project is representing job postings without losing information or introducing misleading counts.
+The mart is designed around remote job postings and their associated skills. A job can be associated with multiple skills, so a job may appear in multiple job-skill rows.
 
-### Key Data Quality Decisions
+The model also preserves remote jobs that have no associated skills. These records are represented separately from job-skill matches, which is why the total mart row count is greater than the number of distinct remote job IDs.
 
-- **Remote-work eligibility:** Include records with explicit `job_work_from_home = TRUE` evidence. A `NULL` remote-work status is treated as unknown, not as `FALSE`.
-- **Jobs without skills:** Retain eligible remote jobs even when no skills are associated with them. Missing skill information does not mean the job itself is missing.
-- **Repeated observations:** Preserve observation history in the warehouse and use a candidate-level model in the analytical layer.
-- **Ambiguous identifiers:** Exclude job IDs associated with conflicting company names or job titles from the Data Mart to avoid unreliable joins.
-- **Duplicate job-skill pairs:** Validate that the Data Mart contains no duplicate combinations of job ID and skill keyword.
-- **Reconciliation:** Compare expected and actual Data Mart row counts during validation.
+Quality checks include:
 
-The candidate key based on `job_id`, `company_name`, and `job_title` is a practical modeling choice. It does not guarantee that every real-world vacancy has a globally unique identity.
+- verifying expected row counts;
+- checking uniqueness of job-skill pairs;
+- checking for duplicate job-skill records;
+- checking that mart rows have evidence of remote work;
+- reviewing the handling of jobs without associated skills;
+- excluding one ambiguous job ID from the final remote-job set.
 
 ## Data Mart
 
-The `mart.job_postings_flat` table provides a flattened analytical dataset connecting eligible remote job candidates with their associated skills.
+The final mart contains **262,171 rows**:
 
-It includes job attributes, observation-related information, remote-work evidence, and skill keywords.
+- **260,155** job-skill rows;
+- **2,016** rows for jobs without associated skills.
 
-The table uses one row per candidate and skill. Eligible jobs without associated skills are retained as rows with a `NULL` skill value.
-
-This structure supports skill counts, role comparisons, and prevalence calculations while preserving jobs that have no skill records.
+The final remote-job set contains **32,760 unique job IDs**. The checks found no duplicate job-skill pairs and no mart rows without remote-work evidence.
 
 ## Analysis and Findings
 
-### Overall Skill Demand
+The ten most frequent skills in the analyzed remote Data Engineer sample are:
 
-The following skills appeared most frequently in the observed remote-job dataset.
+| Rank | Skill | Count |
+|---:|---|---:|
+| 1 | Python | 19,861 |
+| 2 | SQL | 18,557 |
+| 3 | AWS | 10,578 |
+| 4 | Azure | 8,771 |
+| 5 | Snowflake | 6,114 |
+| 6 | Google Cloud Platform (GCP) | 5,548 |
+| 7 | Spark | 5,366 |
+| 8 | Databricks | 4,836 |
+| 9 | Go | 4,485 |
+| 10 | Airflow | 4,447 |
 
-| Skill | Job-skill associations |
-|---|---:|
-| Python | 19,861 |
-| SQL | 18,557 |
-| AWS | 10,578 |
-| Azure | 8,771 |
-| Snowflake | 6,114 |
-| Google Cloud Platform | 5,548 |
-| Apache Spark | 5,366 |
-| Databricks | 4,836 |
-| Go | 4,485 |
-| Apache Airflow | 4,447 |
+Python and SQL are the most frequent skills in this sample. Cloud platforms and data-processing technologies also appear prominently.
 
-These figures represent job-skill associations, not the total number of unique vacancies across all skills. A single job can require multiple skills.
-
-### Differences Between Roles
-
-The role-based analysis highlights different skill profiles:
-
-- **Data Analyst:** SQL, Excel, Python, Tableau, and Power BI are prominent analytical skills.
-- **Data Engineer:** Python, SQL, cloud platforms, Snowflake, Spark, Databricks, Kubernetes, and Airflow are prominent.
-- **Data Scientist:** Python, SQL, R, machine-learning frameworks, and related data science tools are prominent.
-
-The project also calculates skill prevalence by role, allowing skills to be compared as a percentage of jobs within each role rather than only by raw counts.
-
-### Temporal Analysis
-
-Monthly skill-prevalence analysis examines how frequently selected skills appear throughout the collection period.
-
-Because the dataset reflects collected search results, changes over time should be interpreted as changes in the observed sample. They do not necessarily represent changes across the entire remote-job market.
+These counts describe occurrences in the collected sample, not the percentage of all jobs in the market. A single job can contribute multiple skill records.
 
 ## Data Quality Tests
 
-The `04_test_mart.sql` script checks important properties of the Data Mart, including:
+The project checks the following conditions:
 
-- Total row count and distinct job IDs.
-- Jobs retained without associated skills.
-- Duplicate job-skill combinations.
-- Remote-work evidence.
-- Source records with missing job IDs.
-- Reconciliation between Data Mart row counts and their expected components.
+- the final remote-job set has 32,760 unique job IDs;
+- the mart contains 262,171 rows;
+- job-skill pairs are not duplicated;
+- every mart row has evidence that the job is remote;
+- jobs without skills are retained rather than silently discarded.
 
-The executed validation queries produced results consistent with the project's expected counts:
-
-| Validation Metric | Result |
-|---|---:|
-| Total Data Mart rows | 262,171 |
-| Distinct job IDs | 32,760 |
-| Jobs without associated skills | 2,016 |
-| Rows with skill associations | 260,155 |
-| Duplicate job-skill pairs | 0 |
-| Rows without remote-work evidence | 0 |
-
-These checks help identify problems that could otherwise distort analytical results.
-
-The current test script displays query results rather than generating explicit `PASS` or `FAIL` statuses.
+The results above reflect the current successful run of the project SQL scripts.
 
 ## Project Structure
 
@@ -211,74 +151,59 @@ Projects/
     └── README.md
 ```
 
-The DuckDB database files used during local development are not required to be committed to the repository. The pipeline creates or updates database objects when its scripts are executed.
+Database files are generated locally and are not required to be committed to Git.
 
 ## How to Run
 
-### Prerequisites
+Run the commands from the **repository root**.
 
-- DuckDB CLI installed and available in the terminal.
-- The source Parquet files used by the project.
-- Git, if cloning the repository.
+### 1. Open the project database
 
-### 1. Clone the Repository
-
-Run these commands in your terminal:
-
-```bash
-git clone https://github.com/lizashapo-web/SQL_Data_Engineering_Projects.git
-cd SQL_Data_Engineering_Projects
-```
-
-### 2. Configure the Source Data Paths
-
-Open `Projects/2_DW_Mart_Build/00_data_audit.sql` and update the absolute file paths to point to your local copies of the source Parquet files.
-
-Make sure all required source files exist before continuing.
-
-### 3. Open the DuckDB Database
-
-From the repository root, run:
+In Git Bash or another terminal with DuckDB installed:
 
 ```bash
 duckdb Projects/2_DW_Mart_Build/dw_marts.duckdb
 ```
 
-If the database file does not exist locally, DuckDB can create it when opening the path.
+If the database file does not exist yet, DuckDB creates it when it can write to that path.
 
-### 4. Run the Complete Pipeline
+### 2. Build the mart
 
-At the DuckDB prompt, execute:
+At the DuckDB prompt, run:
 
 ```sql
 .read Projects/2_DW_Mart_Build/build_marts.sql
 ```
 
-The orchestration script runs the data audit, warehouse loading, transformations, Data Mart creation, validation queries, and analytical queries in sequence.
+The script runs the mart-building SQL scripts in sequence. If you want to inspect the workflow step by step, execute the individual scripts in their numbered order instead.
 
-You can also execute individual SQL scripts with `.read` to inspect the results of each stage separately.
+### 3. Run the analysis
 
-Review the validation results and investigate unexpected values before relying on the analytical output.
+At the DuckDB prompt, run:
 
-**Note:** The pipeline depends on the source Parquet files being available at the configured paths. A successful Git clone alone is not sufficient to reproduce the results.
+```sql
+.read Projects/2_DW_Mart_Build/05_remote_skills_analysis.sql
+```
+
+### 4. Run the data quality checks
+
+At the DuckDB prompt, run:
+
+```sql
+.read Projects/2_DW_Mart_Build/04_test_mart.sql
+```
+
+> Run SQL commands at the DuckDB prompt, not directly at the Git Bash prompt. The `.read` command is a DuckDB CLI command.
 
 ## Limitations
 
-- **Collection date versus posting date:** `search_date` represents when a job was observed during collection, not necessarily when it was originally published.
-- **Repeated and overlapping results:** The same job ID can appear under multiple search terms or in multiple observations. Counts across search terms may overlap.
-- **Incomplete skill information:** Some jobs have no associated skill records. Their absence from skill-level counts does not mean they require no skills.
-- **Uncertain vacancy identity:** A combination of job ID, company, and title is a practical candidate key but cannot guarantee perfect real-world deduplication.
-- **Sample representativeness:** The collected dataset is not necessarily a complete or unbiased representation of the remote-job market.
-- **Temporal interpretation:** Changes in monthly counts or skill prevalence should not be interpreted as causal effects or definitive market-wide trends.
+- The analysis represents the dataset collected for this project, not the entire job market.
+- `search_date` is the date the record was collected by the search process; it is **not** necessarily the job publication date.
+- Skill counts measure occurrences in the collected job-skill data. They should not be interpreted as the share of all market vacancies requiring a skill.
+- Results depend on the source data, its coverage, and the project's remote-job filtering rules.
 
 ## Conclusion
 
-Remote Work Skills Intelligence demonstrates how SQL can be used to build an analytical data pipeline from raw job-posting data to a validated Data Mart and skill-demand analysis.
-
-Beyond querying data, the project focuses on data modeling, handling missing and ambiguous records, validating transformations, and documenting analytical limitations.
-
-The resulting dataset supports structured comparisons of technical skills across remote Data Analyst, Data Engineer, and Data Scientist roles.
-
----
+This project demonstrates a SQL-based analytical workflow in DuckDB: auditing source data, creating and transforming warehouse tables, building a data mart, validating data quality, and analyzing technical-skill demand in a sample of remote Data Engineer job postings.
 
 **Project Focus:** SQL · DuckDB · Data Engineering · Data Warehousing · Data Quality · Data Modeling · Data Mart · Data Analysis
