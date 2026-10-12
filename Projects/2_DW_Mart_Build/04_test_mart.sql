@@ -88,3 +88,52 @@ SELECT
     ) AS reconciled_rows
 
 FROM mart.job_postings_flat;
+
+-- =========================================================
+-- AUTOMATED ASSERTIONS
+-- The error() function raises an error when a test fails.
+-- =========================================================
+
+-- TEST 7: EXPECTED MART ROW COUNT
+-- Baseline for the current dataset snapshot.
+
+SELECT CASE
+    WHEN COUNT(*) = 262171 THEN 'PASS'
+    ELSE error('FAIL: Unexpected mart row count')
+END AS test_result
+FROM mart.job_postings_flat;
+
+
+-- TEST 8: NO DUPLICATE JOB-SKILL PAIRS
+
+SELECT CASE
+    WHEN COUNT(*) = 0 THEN 'PASS'
+    ELSE error('FAIL: Duplicate job-skill pairs found')
+END AS test_result
+FROM (
+    SELECT job_id, skill_keyword
+    FROM mart.job_postings_flat
+    WHERE skill_keyword IS NOT NULL
+    GROUP BY job_id, skill_keyword
+    HAVING COUNT(*) > 1
+) AS duplicates;
+
+
+-- TEST 9: ALL MART ROWS HAVE REMOTE EVIDENCE
+
+SELECT CASE
+    WHEN COUNT(*) = 0 THEN 'PASS'
+    ELSE error('FAIL: Rows without remote evidence found')
+END AS test_result
+FROM mart.job_postings_flat
+WHERE has_remote_evidence IS NOT TRUE;
+
+
+-- TEST 10: NO NULL JOB IDs IN THE MART
+
+SELECT CASE
+    WHEN COUNT(*) = 0 THEN 'PASS'
+    ELSE error('FAIL: NULL job_id found in mart')
+END AS test_result
+FROM mart.job_postings_flat
+WHERE job_id IS NULL;
