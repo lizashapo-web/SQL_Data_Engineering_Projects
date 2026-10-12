@@ -13,20 +13,20 @@
 -- Staging
 
 DESCRIBE SELECT *
-FROM read_parquet('D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_postings_2025-07.parquet');
+FROM read_parquet('data/raw/raw_job_postings_2025-07.parquet');
 
 DESCRIBE SELECT *
-FROM read_parquet('D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_skills.parquet');
+FROM read_parquet('data/raw/raw_job_skills.parquet');
 
 SELECT *
 FROM read_parquet(
-    'D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_postings_2025-07.parquet'
+    'data/raw/raw_job_postings_2025-07.parquet'
 )
 LIMIT 5;
 
 SELECT *
 FROM read_parquet(
-    'D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_skills.parquet'
+    'data/raw/raw_job_skills.parquet'
 )
 LIMIT 10;
 
@@ -34,7 +34,7 @@ LIMIT 10;
     error,
     COUNT(*) AS amount
 FROM read_parquet(
-    'D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_postings_2025-07.parquet'
+    'data/raw/raw_job_postings_2025-07.parquet'
 )
 GROUP BY error;
 
@@ -46,7 +46,7 @@ CREATE SCHEMA IF NOT EXISTS staging;
 CREATE TABLE IF NOT EXISTS staging.job_postings AS
 SELECT *
 FROM read_parquet(
-    'D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_postings_*.parquet'
+    'data/raw/raw_job_postings_*.parquet'
 )
 WHERE error IS NULL;
 
@@ -57,7 +57,7 @@ LIMIT 10;
 CREATE TABLE IF NOT EXISTS staging.job_skills AS
 SELECT *
 FROM read_parquet(
-    'D:/dbt_Analytics_Engineering_Course/project_1/data/raw/raw_job_skills.parquet'
+    'data/raw/raw_job_skills.parquet'
 );
 
 SELECT COUNT(*)

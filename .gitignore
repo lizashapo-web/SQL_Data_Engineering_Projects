@@ -1,3 +1,5 @@
 Lessons/
 
 *.duckdb
+
+data/raw/*.parquet
