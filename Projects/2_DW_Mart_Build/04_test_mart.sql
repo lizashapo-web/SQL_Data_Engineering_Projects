@@ -94,14 +94,41 @@ FROM mart.job_postings_flat;
 -- The error() function raises an error when a test fails.
 -- =========================================================
 
--- TEST 7: EXPECTED MART ROW COUNT
--- Baseline for the current dataset snapshot.
+
+-- TEST 7: VALID JOB-SKILL ROW STRUCTURE
+-- Jobs without skills must have exactly one NULL-skill row.
+-- Jobs with skills must not have NULL-skill rows.
 
 SELECT CASE
-    WHEN COUNT(*) = 262171 THEN 'PASS'
-    ELSE error('FAIL: Unexpected mart row count')
+    WHEN COUNT(*) = 0 THEN 'PASS'
+    ELSE error('FAIL: Invalid job-skill row structure')
 END AS test_result
-FROM mart.job_postings_flat;
+FROM (
+    SELECT
+        job_id,
+        COUNT(*) FILTER (
+            WHERE skill_keyword IS NULL
+        ) AS rows_without_skills,
+        COUNT(*) FILTER (
+            WHERE skill_keyword IS NOT NULL
+        ) AS rows_with_skills
+    FROM mart.job_postings_flat
+    GROUP BY job_id
+    HAVING
+        (
+            COUNT(*) FILTER (
+                WHERE skill_keyword IS NULL
+            ) > 0
+            AND (
+                COUNT(*) FILTER (
+                    WHERE skill_keyword IS NULL
+                ) <> 1
+                OR COUNT(*) FILTER (
+                    WHERE skill_keyword IS NOT NULL
+                ) > 0
+            )
+        )
+) AS invalid_jobs;
 
 
 -- TEST 8: NO DUPLICATE JOB-SKILL PAIRS
