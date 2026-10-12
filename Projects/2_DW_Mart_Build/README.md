@@ -124,17 +124,69 @@ Python and SQL are the most frequent skills in this sample. Cloud platforms and 
 
 These counts describe occurrences in the collected sample, not the percentage of all jobs in the market. A single job can contribute multiple skill records.
 
+
 ## Data Quality Tests
 
-The project checks the following conditions:
+The project includes SQL-based data quality checks in `04_test_mart.sql`.
 
-- the final remote-job set has 32,760 unique job IDs;
-- the mart contains 262,171 rows;
-- job-skill pairs are not duplicated;
-- every mart row has evidence that the job is remote;
-- jobs without skills are retained rather than silently discarded.
+### Automated Assertions
 
-The results above reflect the current successful run of the project SQL scripts.
+The script contains seven automated assertions:
+
+| Test | Validation |
+|---|---|
+| TEST 7 | Valid job-skill row structure, including jobs without skills |
+| TEST 8 | No duplicate job-skill pairs |
+| TEST 9 | Every mart row has remote-work evidence |
+| TEST 10 | No NULL job IDs in the mart |
+| TEST 11 | Row counts reconcile between rows with and without skills |
+| TEST 12 | Mart job IDs match the expected eligible job ID set |
+| TEST 13 | Each job ID maps to a single company and job title combination |
+
+The assertions return `PASS` when their conditions are satisfied and raise an error when a condition fails.
+
+### Additional Diagnostic Checks
+
+The script also reports:
+- Total mart rows and distinct job IDs.
+- The number of jobs without associated skills.
+- The number of distinct job-skill pairs and duplicate pairs.
+- Rows without remote-work evidence.
+- NULL job IDs in the source warehouse table.
+- Reconciliation of total rows with the rows that have skills and those that do not.
+
+Source-level NULL job IDs are reported for diagnostic purposes and are not the same as NULL job IDs in the final mart.
+
+### Current Validation Results
+
+For the current dataset snapshot, the successful pipeline run produced:
+
+- **32,760** unique job IDs in the mart.
+- **262,171** total mart rows.
+- **260,155** rows with skills.
+- **2,016** rows representing jobs without skills.
+- **0** duplicate job-skill pairs.
+- **0** mart rows without remote-work evidence.
+- **0** NULL job IDs in the mart.
+
+These figures describe the current dataset snapshot. They are not all fixed thresholds used by the automated assertions.
+
+### Running the Tests
+
+From the repository root, open the DuckDB database and run the pipeline first:
+
+```sql
+.read Projects/2_DW_Mart_Build/build_marts.sql
+```
+
+Then run the data quality checks:
+
+```sql
+.read Projects/2_DW_Mart_Build/04_test_mart.sql
+```
+
+Review the diagnostic outputs and confirm that all seven automated assertions return `PASS`.
+
 
 ## Project Structure
 
