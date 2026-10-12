@@ -29,7 +29,7 @@ The project uses job-posting and skill data collected between **July 2025 and Ju
 
 The source data includes job titles, company names, locations, search terms, collection dates, remote-work indicators, and skill keywords associated with job IDs.
 
-### Data volume
+### Data Volume
 
 | Dataset | Rows |
 |---|---:|
@@ -50,9 +50,11 @@ The final Data Mart contains:
 - **260,155 rows with skill associations**
 - **2,016 jobs without associated skills**
 
-The row counts reconcile: 260,155 rows with skills plus 2,016 rows without skills equals 262,171 total rows.
+The row counts reconcile:
 
-### Source file requirements
+`260,155 + 2,016 = 262,171`
+
+### Source File Requirements
 
 The source Parquet files are stored locally and are not included in this repository.
 
@@ -68,7 +70,7 @@ The directory contains 12 monthly job-posting files, from `raw_job_postings_2025
 
 ## Data Pipeline
 
-The pipeline consists of six stages.
+The pipeline consists of six stages:
 
 1. **Data Audit** — inspect source data, identify missing values, examine repeated observations, and assess identifier quality.
 2. **Load the Data Warehouse** — load source datasets into warehouse tables.
@@ -110,7 +112,7 @@ The `build_marts.sql` script orchestrates the individual SQL files in the intend
 
 A central challenge in this project is representing job postings without losing information or introducing misleading counts.
 
-### Key data quality decisions
+### Key Data Quality Decisions
 
 - **Remote-work eligibility:** Include records with explicit `job_work_from_home = TRUE` evidence. A `NULL` remote-work status is treated as unknown, not as `FALSE`.
 - **Jobs without skills:** Retain eligible remote jobs even when no skills are associated with them. Missing skill information does not mean the job itself is missing.
@@ -133,7 +135,7 @@ This structure supports skill counts, role comparisons, and prevalence calculati
 
 ## Analysis and Findings
 
-### Overall skill demand
+### Overall Skill Demand
 
 The following skills appeared most frequently in the observed remote-job dataset.
 
@@ -152,9 +154,9 @@ The following skills appeared most frequently in the observed remote-job dataset
 
 These figures represent job-skill associations, not the total number of unique vacancies across all skills. A single job can require multiple skills.
 
-### Differences between roles
+### Differences Between Roles
 
-The role-based analysis highlights different skill profiles.
+The role-based analysis highlights different skill profiles:
 
 - **Data Analyst:** SQL, Excel, Python, Tableau, and Power BI are prominent analytical skills.
 - **Data Engineer:** Python, SQL, cloud platforms, Snowflake, Spark, Databricks, Kubernetes, and Airflow are prominent.
@@ -162,7 +164,7 @@ The role-based analysis highlights different skill profiles.
 
 The project also calculates skill prevalence by role, allowing skills to be compared as a percentage of jobs within each role rather than only by raw counts.
 
-### Temporal analysis
+### Temporal Analysis
 
 Monthly skill-prevalence analysis examines how frequently selected skills appear throughout the collection period.
 
@@ -181,7 +183,7 @@ The `04_test_mart.sql` script checks important properties of the Data Mart, incl
 
 The executed validation queries produced results consistent with the project's expected counts:
 
-| Validation metric | Result |
+| Validation Metric | Result |
 |---|---:|
 | Total Data Mart rows | 262,171 |
 | Distinct job IDs | 32,760 |
@@ -190,7 +192,9 @@ The executed validation queries produced results consistent with the project's e
 | Duplicate job-skill pairs | 0 |
 | Rows without remote-work evidence | 0 |
 
-These checks help identify problems that could otherwise distort analytical results. The current test script displays query results rather than generating explicit `PASS` or `FAIL` statuses.
+These checks help identify problems that could otherwise distort analytical results.
+
+The current test script displays query results rather than generating explicit `PASS` or `FAIL` statuses.
 
 ## Project Structure
 
@@ -217,7 +221,7 @@ The DuckDB database files used during local development are not required to be c
 - The source Parquet files used by the project.
 - Git, if cloning the repository.
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 Run these commands in your terminal:
 
@@ -226,7 +230,7 @@ git clone https://github.com/lizashapo-web/SQL_Data_Engineering_Projects.git
 cd SQL_Data_Engineering_Projects
 ```
 
-### 2. Configure the source data paths
+### 2. Configure the Source Data Paths
 
 Open `Projects/2_DW_Mart_Build/00_data_audit.sql`.
 
@@ -234,7 +238,7 @@ Update the absolute file paths to point to your local copies of the source Parqu
 
 Make sure all required source files exist before continuing.
 
-### 3. Open the DuckDB database
+### 3. Open the DuckDB Database
 
 From the repository root, run:
 
@@ -244,7 +248,7 @@ duckdb Projects/2_DW_Mart_Build/dw_marts.duckdb
 
 If the database file does not exist locally, DuckDB can create it when opening the path.
 
-### 4. Run the complete pipeline
+### 4. Run the Complete Pipeline
 
 At the DuckDB prompt, execute:
 
@@ -279,4 +283,4 @@ The resulting dataset supports structured comparisons of technical skills across
 
 ---
 
-**Project focus:** SQL · DuckDB · Data Engineering · Data Warehousing · Data Quality · Data Modeling · Data Mart · Data Analysis
+**Project Focus:** SQL · DuckDB · Data Engineering · Data Warehousing · Data Quality · Data Modeling · Data Mart · Data Analysis
