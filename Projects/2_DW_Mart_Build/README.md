@@ -275,7 +275,7 @@ If you prefer to execute the steps individually, follow the instructions below.
 In Git Bash or another terminal with DuckDB installed:
 
 ```bash
-duckdb Projects/2_DW_Mart_Build/dw_marts.duckdb
+duckdb job_market.duckdb
 ```
 
 If the database file does not exist yet, DuckDB creates it when it can write to that path.
