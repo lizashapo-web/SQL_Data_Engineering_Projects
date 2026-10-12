@@ -226,16 +226,21 @@ Review the diagnostic outputs and confirm that all seven automated assertions re
 ## Project Structure
 
 ```text
-Projects/
-└── 2_DW_Mart_Build/
-    ├── 00_data_audit.sql
-    ├── 01_create_tables_dw.sql
-    ├── 02_transform_warehouse.sql
-    ├── 03_data_mart.sql
-    ├── 04_test_mart.sql
-    ├── 05_remote_skills_analysis.sql
-    ├── build_marts.sql
-    └── README.md
+SQL_Data_Engineering_Projects/
+├── .gitignore
+├── run_pipeline.bat
+├── data/
+│   └── raw/                         # Local Parquet files, excluded from Git
+└── Projects/
+    └── 2_DW_Mart_Build/
+        ├── 00_data_audit.sql
+        ├── 01_create_tables_dw.sql
+        ├── 02_transform_warehouse.sql
+        ├── 03_data_mart.sql
+        ├── 04_test_mart.sql
+        ├── 05_remote_skills_analysis.sql
+        ├── build_marts.sql
+        └── README.md
 ```
 
 Database files are generated locally and are not required to be committed to Git.
