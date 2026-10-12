@@ -232,9 +232,7 @@ cd SQL_Data_Engineering_Projects
 
 ### 2. Configure the Source Data Paths
 
-Open `Projects/2_DW_Mart_Build/00_data_audit.sql`.
-
-Update the absolute file paths to point to your local copies of the source Parquet files.
+Open `Projects/2_DW_Mart_Build/00_data_audit.sql` and update the absolute file paths to point to your local copies of the source Parquet files.
 
 Make sure all required source files exist before continuing.
 
