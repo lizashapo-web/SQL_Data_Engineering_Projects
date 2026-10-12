@@ -173,27 +173,40 @@ Projects/
 
 ### Prerequisites
 
-- DuckDB
-- The source data files used by the project
+- DuckDB CLI
+- The source Parquet files used by the project
 - Git, if cloning the repository
 
-### Steps
+### Setup
 
-1. Clone the repository and open the project directory.
+1. Clone the repository:
 
-2. Make sure the source data files are available locally and that the paths referenced by the SQL scripts point to their actual locations.
-
-3. Run the pipeline from the repository root using the DuckDB CLI:
-
-   ```sql
-   .read Projects/2_DW_Mart_Build/build_marts.sql
+   ```bash
+   git clone https://github.com/lizashapo-web/SQL_Data_Engineering_Projects.git
+   cd SQL_Data_Engineering_Projects
    ```
 
-4. Review the output of the Data Mart tests.
+2. Make sure the source Parquet files are available locally.
 
-5. Run individual queries from `05_remote_skills_analysis.sql` to explore skill rankings, role comparisons, prevalence, and monthly trends.
+3. Update the source file paths in `00_data_audit.sql` to match your local data directory. The current script uses absolute paths specific to the original development environment.
 
-**Note:** The scripts use relative project paths and may depend on the location of the source files. Update those paths if your local directory structure differs.
+### Run the Pipeline
+
+From the repository root, start the DuckDB CLI and execute:
+
+```sql
+.read Projects/2_DW_Mart_Build/build_marts.sql
+```
+
+The pipeline runs the data audit, warehouse loading, transformations, Data Mart creation, validation tests, and analytical queries in sequence.
+
+Review the test results and investigate any failed checks before relying on the analytical output.
+
+### Explore the Analysis
+
+Open `05_remote_skills_analysis.sql` to review the queries for skill rankings, comparisons between job roles, skill prevalence, and monthly trends.
+
+**Note:** The source Parquet files and their local paths are not included in the repository setup shown here. A fresh clone requires access to the source data and correct local paths before the pipeline can run successfully.
 
 ## Limitations
 
