@@ -1,5 +1,6 @@
 Lessons/
 
 *.duckdb
+*.duckdb.wal
 
 data/raw/*.parquet
