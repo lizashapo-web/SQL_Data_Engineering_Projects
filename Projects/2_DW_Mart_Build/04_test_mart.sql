@@ -254,3 +254,20 @@ SELECT CASE
     ELSE error('FAIL: Unexpected jobs found in mart')
 END AS test_result
 FROM comparison;
+
+
+-- =========================================================
+-- TEST 13: ONE JOB ID PER COMPANY AND JOB TITLE
+-- A job_id must not map to multiple company/title combinations.
+-- =========================================================
+
+SELECT CASE
+    WHEN COUNT(*) = 0 THEN 'PASS'
+    ELSE error('FAIL: Job IDs map to multiple company/title combinations')
+END AS test_result
+FROM (
+    SELECT job_id
+    FROM mart.job_postings_flat
+    GROUP BY job_id
+    HAVING COUNT(DISTINCT (company_name, job_title)) > 1
+) AS inconsistent_jobs;
