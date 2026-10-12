@@ -234,7 +234,7 @@ This project demonstrates practical SQL skills including:
 ## Project Structure
 
 ```text
-data-engineer-skills-analysis/
+Projects/1_EDA/
 │
 ├── 01_top_demanded_skills.sql
 ├── 02_highest_paying_skills.sql
