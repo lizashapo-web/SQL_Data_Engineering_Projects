@@ -164,3 +164,28 @@ SELECT CASE
 END AS test_result
 FROM mart.job_postings_flat
 WHERE job_id IS NULL;
+
+
+-- =========================================================
+-- TEST 11: ROW COUNT RECONCILIATION
+-- Total rows must equal rows with skills plus rows without skills.
+-- =========================================================
+
+WITH row_counts AS (
+    SELECT
+        COUNT(*) AS total_rows,
+        COUNT(*) FILTER (
+            WHERE skill_keyword IS NOT NULL
+        ) AS rows_with_skills,
+        COUNT(*) FILTER (
+            WHERE skill_keyword IS NULL
+        ) AS rows_without_skills
+    FROM mart.job_postings_flat
+)
+
+SELECT CASE
+    WHEN total_rows = rows_with_skills + rows_without_skills
+        THEN 'PASS'
+    ELSE error('FAIL: Mart row counts do not reconcile')
+END AS test_result
+FROM row_counts;
