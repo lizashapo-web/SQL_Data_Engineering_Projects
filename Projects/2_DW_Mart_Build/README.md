@@ -244,6 +244,32 @@ Database files are generated locally and are not required to be committed to Git
 
 Run the commands from the **repository root**.
 
+### Quick Start (Windows)
+
+**Prerequisites:**
+- DuckDB CLI installed and available in `PATH`.
+- Source Parquet files placed in `data/raw/` at the repository root.
+
+From Git Bash, run the complete pipeline with:
+
+```bash
+cmd.exe //c run_pipeline.bat
+```
+
+Alternatively, from Windows Command Prompt opened in the repository root, run:
+
+```bat
+run_pipeline.bat
+```
+
+The batch file runs `Projects/2_DW_Mart_Build/build_marts.sql` against a local DuckDB database named `job_market.duckdb` in the repository root. It prints a success message when the pipeline completes or reports a failure if an error occurs.
+
+The database and source Parquet files are local artifacts and are excluded from version control.
+
+### Manual Execution
+
+If you prefer to execute the steps individually, follow the instructions below.
+
 ### 1. Open the project database
 
 In Git Bash or another terminal with DuckDB installed:
