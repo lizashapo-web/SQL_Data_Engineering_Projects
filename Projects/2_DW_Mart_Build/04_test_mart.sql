@@ -189,3 +189,68 @@ SELECT CASE
     ELSE error('FAIL: Mart row counts do not reconcile')
 END AS test_result
 FROM row_counts;
+
+
+-- =========================================================
+-- TEST 12: MART JOB COVERAGE
+-- Every eligible job must exist in the mart.
+-- The mart must not contain unexpected job IDs.
+-- =========================================================
+
+WITH ambiguous_job_ids AS (
+    SELECT job_id
+    FROM warehouse.job_postings
+    WHERE job_id IS NOT NULL
+    GROUP BY job_id
+    HAVING
+        COUNT(DISTINCT company_name) > 1
+        OR COUNT(DISTINCT job_title) > 1
+),
+
+expected_job_ids AS (
+    SELECT DISTINCT c.job_id
+    FROM warehouse.job_candidates c
+    WHERE c.job_id IS NOT NULL
+      AND c.remote_observation_count > 0
+      AND NOT EXISTS (
+          SELECT 1
+          FROM ambiguous_job_ids a
+          WHERE a.job_id = c.job_id
+      )
+),
+
+mart_job_ids AS (
+    SELECT DISTINCT job_id
+    FROM mart.job_postings_flat
+    WHERE job_id IS NOT NULL
+),
+
+comparison AS (
+    SELECT
+        (
+            SELECT COUNT(*)
+            FROM (
+                SELECT job_id FROM expected_job_ids
+                EXCEPT
+                SELECT job_id FROM mart_job_ids
+            ) AS missing
+        ) AS missing_jobs,
+
+        (
+            SELECT COUNT(*)
+            FROM (
+                SELECT job_id FROM mart_job_ids
+                EXCEPT
+                SELECT job_id FROM expected_job_ids
+            ) AS unexpected
+        ) AS unexpected_jobs
+)
+
+SELECT CASE
+    WHEN missing_jobs = 0 AND unexpected_jobs = 0
+        THEN 'PASS'
+    WHEN missing_jobs > 0
+        THEN error('FAIL: Eligible jobs are missing from mart')
+    ELSE error('FAIL: Unexpected jobs found in mart')
+END AS test_result
+FROM comparison;
